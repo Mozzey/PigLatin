@@ -26,13 +26,25 @@ namespace PigLatinTranslator
                 Console.Write("Please enter a word to be translated: ");
                 // store user input and convert to lower case
                 userWord = Console.ReadLine().ToLower();
-                string firstLetter = userWord.Substring(0, 1);
-                int firstVowelIndex = userWord.IndexOfAny(vowels);
+                // length of the userWord
                 int userWordLength = userWord.Length;
-                string fromFirstVowel = userWord.Substring(firstVowelIndex, userWordLength - 1);
+                // get the first letter of the userWord
+                string firstLetter = userWord.Substring(0, 1).Trim();
+                // get the index of the first vowel
+                int firstVowelIndex = userWord.IndexOfAny(vowels);
+                // ============================================================
+                // a substring of userWord starting at index 0 and ending before the first vowel
                 string beforeFirstVowel = userWord.Substring(0, firstVowelIndex);
+                // the length of the substring before the first vowel
+                int beforeFirstVowelLength = beforeFirstVowel.Length;
+                // =============================================================
+                // a substring of userWord starting at the first vowel and ending at the userWord last index
+                string fromFirstVowel = userWord.Substring(firstVowelIndex, (userWordLength - firstVowelIndex));
+                // length of the userWord substring fromFirstVowel
+                int fromFirstVowelLength = fromFirstVowel.Length;
+                // =============================================================
 
-                if (userWord.IndexOf(firstLetter) == firstVowelIndex)
+                if (firstVowelIndex == 0)
                 {
                     Console.WriteLine($"{userWord}-way");
                 }
@@ -40,12 +52,11 @@ namespace PigLatinTranslator
                 {
                     Console.WriteLine($"{fromFirstVowel}-{beforeFirstVowel}ay");
                 }
-                else if (beforeFirstVowel.Length < firstVowelIndex)
+                else if (beforeFirstVowelLength < firstVowelIndex)
                 {
                     Console.WriteLine($"{fromFirstVowel}-{beforeFirstVowel}ay");
                 }
                 // ask if the user would like to play again
-            
                 if (!PlayAgain())
                 {
                     Console.WriteLine("Goodbye!");
