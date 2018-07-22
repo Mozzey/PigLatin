@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Collections.Generic;
 
 namespace PigLatinTranslator
@@ -8,18 +9,14 @@ namespace PigLatinTranslator
     {
         static void Main(string[] args)
         {
-            string userInput;
             // loop flag
             bool isRunning = true;
             while (isRunning)
             {
-                Console.ForegroundColor = ConsoleColor.White;
-                // greet user
-                Console.WriteLine("Welcome to the Pig Latin Translator!");
-                // prompt the user for a word
-                Console.Write("Please enter a word to be translated: ");
+                // greet the user
+                GreetUser();
                 // store user input and convert to lower case
-                userInput = Console.ReadLine();
+                string userInput = Console.ReadLine();
                 // store piglatin translation
                 string pigLatin = TranslateToPigLatin(userInput);
                 // display translation
@@ -76,7 +73,6 @@ namespace PigLatinTranslator
             StringBuilder pigLatinWords = new StringBuilder();
             // user input split into an array from the space character
             string[] userInputArray = userInput.Trim().Split(' ');
-            
             // iterate through each word in the user input
             foreach (var word in userInputArray)
             {
@@ -86,17 +82,27 @@ namespace PigLatinTranslator
                     Console.WriteLine("Sorry but you didn't input anything to be translated");
                     break;
                 }
-                // VARIABLES
+                
+                // WORD SUBSTRINGS
                 // first vowel index of each word
                 int firstVowelIndex = word.IndexOfAny(VOWELS);
                 // word before vowel - ternary operator stating if there is a vowel in the word, beforeFirstVowel returns substring before first vowel
                 // else beforeFirstVowel becomes word as to not be ArgumentOutOfBounds
-                string beforeFirstVowel = (word.IndexOfAny(VOWELS) != -1) ? word.Substring(0, firstVowelIndex) : word;
+                string beforeFirstVowel = (ContainsVowel(word, VOWELS)) ? word.Substring(0, firstVowelIndex) : word;
                 // word from first vowel - t- ternary operator stating if there is a vowel in the word, fromFirstVowel returns substring from the first vowel to the end of the word
                 // else beforeFirstVowel becomes word as to not be ArgumentOutOfBounds
-                string fromFirstVowel = (word.IndexOfAny(VOWELS) != -1) ? word.Substring(firstVowelIndex, (word.Length - firstVowelIndex)) : word;
+                string fromFirstVowel = (ContainsVowel(word, VOWELS)) ? word.Substring(firstVowelIndex, (word.Length - firstVowelIndex)) : word;
+                // if word contains a number
+                if (ContainsNumber(word))
+                {
+                    pigLatinWords.Append($"{word}").Append(" ");
+                }
+                else if (ContainsSymbol(word) && firstVowelIndex == 0 || ContainsSymbol(word) && firstVowelIndex > 0)
+                {
+                    pigLatinWords.Append($"{word}").Append(" ");
+                }
                 // if the first letter is a vowel
-                if (firstVowelIndex == 0)
+                else if (firstVowelIndex == 0)
                 {
                     pigLatinWords.Append($"{word}-way").Append(" ");
                 }
@@ -106,9 +112,14 @@ namespace PigLatinTranslator
                     pigLatinWords.Append($"{fromFirstVowel}-{beforeFirstVowel}ay").Append(" ");
                 }
                 // if there are no vowels
-                else if (firstVowelIndex == -1)
+                else if (!ContainsVowel(word, VOWELS))
                 {
                     pigLatinWords.Append($"{word}-ay").Append(" ");
+                }
+                // has number and doesnt have vowel
+                else if ((ContainsNumber(userInput) && !ContainsVowel(word, VOWELS)))
+                {
+                    pigLatinWords.Append($"{word}").Append(" ");
                 }
             }
             // fancy pants success color for translated input
@@ -117,6 +128,48 @@ namespace PigLatinTranslator
             return string.Join(' ',pigLatinWords);
         }
 
+        private static bool ContainsVowel(string userInput, char[] VOWELS)
+        {
+            if (userInput.IndexOfAny(VOWELS) != -1)
+            {
+                return true;
+            }
+            return false;
+        }
 
+        private static void GreetUser()
+        {
+            Console.ForegroundColor = ConsoleColor.White;
+            // greet user
+            Console.WriteLine("Welcome to the Pig Latin Translator!");
+            // prompt the user for a word
+            Console.Write("Please enter a word to be translated: ");
+        }
+        
+        private static bool ContainsNumber(string userInput)
+        {
+            Regex containsNumber = new Regex(@"[0-9]");
+            if (containsNumber.IsMatch(userInput))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private static bool ContainsSymbol(string userInput)
+        {
+            Regex containsSymbol = new Regex(@"\W");
+            if (containsSymbol.IsMatch(userInput))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 }
