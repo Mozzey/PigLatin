@@ -78,22 +78,6 @@ namespace PigLatinTranslator
             // iterate through each word in the user input
             foreach (var word in userInputArray)
             {
-                /*if (ContainsPunctuation(word, PUNCTUATION))
-                {
-                    // index of punctuation
-                    int indexOfPunctuation = word.IndexOfAny(PUNCTUATION);
-                    // substring grabbing the punctuation
-                    string punctuationMark = word.Substring(indexOfPunctuation, 1);
-                    // assign the punctuation to another variable so it can be worked on
-                    string wordNoPunctuation = punctuationMark;
-
-                    if (indexOfPunctuation != -1)
-                    {
-                        wordNoPunctuation = word.Remove(indexOfPunctuation, 1);
-                        Console.WriteLine($"{wordNoPunctuation}");
-                    }
-                }*/
-                
                 // WORD SUBSTRINGS
                 // first vowel index of each word
                 int firstVowelIndex = word.IndexOfAny(VOWELS);
@@ -103,8 +87,13 @@ namespace PigLatinTranslator
                 // word from first vowel - t- ternary operator stating if there is a vowel in the word, fromFirstVowel returns substring from the first vowel to the end of the word
                 // else beforeFirstVowel becomes word as to not be ArgumentOutOfBounds
                 string fromFirstVowel = (ContainsVowel(word, VOWELS)) ? word.Substring(firstVowelIndex, (word.Length - firstVowelIndex)) : word;
+                // if character contains punctuation allow it ex: "hey you're over there!" == "ey-hay ou're-yay over-way ere-thay!"
+                if (ContainsPunctuation(word, PUNCTUATION))
+                {
+                    pigLatinWords.Append($"{AllowPunctuation(word, PUNCTUATION)}").Append(" ");
+                }
                 // if word contains a number
-                if (ContainsNumber(word))
+                else if (ContainsNumber(word))
                 {
                     pigLatinWords.Append($"{word}").Append(" ");
                 }
@@ -114,7 +103,7 @@ namespace PigLatinTranslator
                     pigLatinWords.Append($"{word}").Append(" ");
                 }
                 // if the first letter is a vowel
-                else if (firstVowelIndex == 0 && ContainsPunctuation(word, PUNCTUATION))
+                else if (firstVowelIndex == 0 || (firstVowelIndex == 0 && ContainsPunctuation(word, PUNCTUATION)))
                 {
                     
                     pigLatinWords.Append($"{word}-way").Append(" ");
@@ -140,7 +129,6 @@ namespace PigLatinTranslator
             // join the words in the piglatin string builder at the space character
             return string.Join(' ',pigLatinWords);
         }
-
         // hey hey hey to the user
         private static void GreetUser()
         {
@@ -210,6 +198,26 @@ namespace PigLatinTranslator
             else
             {
                 return false;
+            }
+        }
+        // gets the punctuation and moves it to the end of the word
+        private static string AllowPunctuation(string userInput, char[] PUNCTUATION)
+        {
+            int indexOfPunctuation = userInput.IndexOfAny(PUNCTUATION);
+            // substring grabbing the punctuation
+            string punctuationMark = userInput.Substring(indexOfPunctuation, 1);
+            // assign the punctuation to another variable so it can be worked on
+            string wordNoPunctuation;
+
+            if (indexOfPunctuation == -1)
+            {
+                return userInput;
+            }
+            else
+            {
+                wordNoPunctuation = userInput.Remove(indexOfPunctuation, 1);
+                string pigLatinWithPunctuation = $"{TranslateToPigLatin(wordNoPunctuation).Trim()}{punctuationMark}";
+                return pigLatinWithPunctuation;
             }
         }
     }
