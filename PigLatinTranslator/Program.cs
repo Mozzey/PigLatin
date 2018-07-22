@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Collections.Generic;
 
 namespace PigLatinTranslator
@@ -14,12 +15,12 @@ namespace PigLatinTranslator
             // TREAT Y AS A CONSONANT
             // ======================
             // string vowels = "AEIOUaeiou";
-            char[] VOWELS = { 'a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U' };
+            //char[] VOWELS = { 'a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U' };
             // user input
-            string userWord;
+            string userInput;
+            
             // loop flag
             bool isRunning = true;
-            //List<string> pigLatinWords = new List<string>();
             while (isRunning)
             {
                 Console.ForegroundColor = ConsoleColor.White;
@@ -28,39 +29,12 @@ namespace PigLatinTranslator
                 // prompt the user for a word
                 Console.Write("Please enter a word to be translated: ");
                 // store user input and convert to lower case
-                userWord = Console.ReadLine();
-                try
-                {
-                    // length of the userWord
-                    int userWordLength = userWord.Length;
-                    // get the first letter of the userWord
-                    string firstLetter = userWord.Substring(0, 1).Trim();
-                    // get the index of the first vowel
-                    int firstVowelIndex = userWord.IndexOfAny(VOWELS);
-                    // ============================================================
-                    // a substring of userWord starting at index 0 and ending before the first vowel
-                    string beforeFirstVowel = userWord.Substring(0, firstVowelIndex);
-                    // the length of the substring before the first vowel
-                    int beforeFirstVowelLength = beforeFirstVowel.Length;
-                    // =============================================================
-                    // a substring of userWord starting at the first vowel and ending at the userWord last index
-                    string fromFirstVowel = userWord.Substring(firstVowelIndex, (userWordLength - firstVowelIndex));
-                    // length of the userWord substring fromFirstVowel
-                    int fromFirstVowelLength = fromFirstVowel.Length;
-                    // =============================================================
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    // if the first letter starts with a vowel add "way" to the end
-                    DisplayStartsWithVowel(firstVowelIndex, userWord);
-                    // find the first vowel, cut the word before the vowel, append what you cut to the end and add "ay"
-                    DisplayFromFirstVowel(VOWELS, userWord, fromFirstVowel, beforeFirstVowel, firstVowelIndex);
-                }
-                // if there is no vowel in the word inform the user
-                catch (ArgumentOutOfRangeException)
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"Sorry but there is no vowel in the word: {userWord}");
-                }
-                
+                userInput = Console.ReadLine();
+                // store piglatin translation
+                string pigLatin = TranslateToPigLatin(userInput);
+                // display translation
+                Console.WriteLine(pigLatin);
+               
                 // ask if the user would like to play again
                 if (!PlayAgain())
                 {
@@ -103,22 +77,51 @@ namespace PigLatinTranslator
                 return PlayAgain();
             }
         }
-        // if the first letter starts with a vowel add "way" to the end
-        private static void DisplayStartsWithVowel(int firstVowelIndex, string userWord)
+        // seperate method to translate userInput into piglatin
+        private static string TranslateToPigLatin(string userInput)
         {
-            if (firstVowelIndex <= 0)
+            // an array of vowels to check userInput words against
+            char[] VOWELS = { 'a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U' };
+            // string builder to create a string with the translated words
+            StringBuilder pigLatinWords = new StringBuilder();
+            // user input split into an array from the space character
+            string[] userInputArray = userInput.Trim().Split(' ');
+            
+            // iterate through each word in the user input
+            foreach (var word in userInputArray)
             {
-                Console.WriteLine($"{userWord}-way ");
+                if (String.IsNullOrEmpty(userInput) || String.IsNullOrWhiteSpace(userInput))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Sorry but you didn't input anything to be translated");
+                    break;
+                }
+                // VARIABLES
+                // first vowel index of each word
+                int firstVowelIndex = word.IndexOfAny(VOWELS);
+                // word before vowel
+                string beforeFirstVowel = (word.IndexOfAny(VOWELS) != -1) ? word.Substring(0, firstVowelIndex) : word;
+                // word from first vowel
+                string fromFirstVowel = (word.IndexOfAny(VOWELS) != -1) ? word.Substring(firstVowelIndex, (word.Length - firstVowelIndex)) : word;
+                // if the first letter is a vowel
+                if (firstVowelIndex == 0)
+                {
+                    pigLatinWords.Append($"{word}-way").Append(" ");
+                }
+                // find the first vowel and do the translation
+                else if (firstVowelIndex > 0)
+                {
+                    pigLatinWords.Append($"{fromFirstVowel}-{beforeFirstVowel}ay").Append(" ");
+                }
+                else if (firstVowelIndex == -1)
+                {
+                    pigLatinWords.Append($"{word}-ay").Append(" ");
+                }
             }
-        }
-        // find the first vowel, cut the word before the vowel, append what you cut to the end and add "ay"
-        private static void DisplayFromFirstVowel(char[] VOWELS, string userWord, string fromFirstVowel, string beforeFirstVowel, int firstVowelIndex)
-        {
-            if (userWord.IndexOfAny(VOWELS) != -1 && firstVowelIndex > 0)
-            {
-                
-                Console.WriteLine($"{fromFirstVowel}-{beforeFirstVowel}ay");
-            }
+            // fancy pants success color for translated input
+            Console.ForegroundColor = ConsoleColor.Green;
+            // join the words in the piglatin string builder at the space character
+            return string.Join(' ',pigLatinWords);
         }
     }
 }
