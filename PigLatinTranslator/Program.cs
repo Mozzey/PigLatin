@@ -8,17 +8,7 @@ namespace PigLatinTranslator
     {
         static void Main(string[] args)
         {
-            // if input word starts with a vowel just append "way" to the end
-            // else move all consonants that appear before the first found vowel
-            // to the end of the word and then append "ay"
-            // ======================
-            // TREAT Y AS A CONSONANT
-            // ======================
-            // string vowels = "AEIOUaeiou";
-            //char[] VOWELS = { 'a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U' };
-            // user input
             string userInput;
-            
             // loop flag
             bool isRunning = true;
             while (isRunning)
@@ -90,7 +80,7 @@ namespace PigLatinTranslator
             // iterate through each word in the user input
             foreach (var word in userInputArray)
             {
-                if (String.IsNullOrEmpty(userInput) || String.IsNullOrWhiteSpace(userInput))
+                if (String.IsNullOrWhiteSpace(userInput))
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Sorry but you didn't input anything to be translated");
@@ -99,9 +89,11 @@ namespace PigLatinTranslator
                 // VARIABLES
                 // first vowel index of each word
                 int firstVowelIndex = word.IndexOfAny(VOWELS);
-                // word before vowel
+                // word before vowel - ternary operator stating if there is a vowel in the word, beforeFirstVowel returns substring before first vowel
+                // else beforeFirstVowel becomes word as to not be ArgumentOutOfBounds
                 string beforeFirstVowel = (word.IndexOfAny(VOWELS) != -1) ? word.Substring(0, firstVowelIndex) : word;
-                // word from first vowel
+                // word from first vowel - t- ternary operator stating if there is a vowel in the word, fromFirstVowel returns substring from the first vowel to the end of the word
+                // else beforeFirstVowel becomes word as to not be ArgumentOutOfBounds
                 string fromFirstVowel = (word.IndexOfAny(VOWELS) != -1) ? word.Substring(firstVowelIndex, (word.Length - firstVowelIndex)) : word;
                 // if the first letter is a vowel
                 if (firstVowelIndex == 0)
@@ -113,6 +105,7 @@ namespace PigLatinTranslator
                 {
                     pigLatinWords.Append($"{fromFirstVowel}-{beforeFirstVowel}ay").Append(" ");
                 }
+                // if there are no vowels
                 else if (firstVowelIndex == -1)
                 {
                     pigLatinWords.Append($"{word}-ay").Append(" ");
@@ -123,5 +116,7 @@ namespace PigLatinTranslator
             // join the words in the piglatin string builder at the space character
             return string.Join(' ',pigLatinWords);
         }
+
+
     }
 }
