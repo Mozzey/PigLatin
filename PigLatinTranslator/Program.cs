@@ -16,7 +16,7 @@ namespace PigLatinTranslator
                 // greet the user
                 GreetUser();
                 // store user input and convert to lower case
-                string userInput = Console.ReadLine();
+                string userInput = Console.ReadLine().ToLower();
                 // store piglatin translation
                 string pigLatin = TranslateToPigLatin(userInput);
                 // display translation
@@ -69,6 +69,8 @@ namespace PigLatinTranslator
         {
             // an array of vowels to check userInput words against
             char[] VOWELS = { 'a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U' };
+            // an array of acceptable punctuation
+            char[] PUNCTUATION = { '!', ',', '.', '?' };
             // string builder to create a string with the translated words
             StringBuilder pigLatinWords = new StringBuilder();
             // user input split into an array from the space character
@@ -76,12 +78,21 @@ namespace PigLatinTranslator
             // iterate through each word in the user input
             foreach (var word in userInputArray)
             {
-                if (String.IsNullOrWhiteSpace(userInput))
+                /*if (ContainsPunctuation(word, PUNCTUATION))
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Sorry but you didn't input anything to be translated");
-                    break;
-                }
+                    // index of punctuation
+                    int indexOfPunctuation = word.IndexOfAny(PUNCTUATION);
+                    // substring grabbing the punctuation
+                    string punctuationMark = word.Substring(indexOfPunctuation, 1);
+                    // assign the punctuation to another variable so it can be worked on
+                    string wordNoPunctuation = punctuationMark;
+
+                    if (indexOfPunctuation != -1)
+                    {
+                        wordNoPunctuation = word.Remove(indexOfPunctuation, 1);
+                        Console.WriteLine($"{wordNoPunctuation}");
+                    }
+                }*/
                 
                 // WORD SUBSTRINGS
                 // first vowel index of each word
@@ -103,8 +114,9 @@ namespace PigLatinTranslator
                     pigLatinWords.Append($"{word}").Append(" ");
                 }
                 // if the first letter is a vowel
-                else if (firstVowelIndex == 0)
+                else if (firstVowelIndex == 0 && ContainsPunctuation(word, PUNCTUATION))
                 {
+                    
                     pigLatinWords.Append($"{word}-way").Append(" ");
                 }
                 // find the first vowel and do the translation
@@ -112,8 +124,8 @@ namespace PigLatinTranslator
                 {
                     pigLatinWords.Append($"{fromFirstVowel}-{beforeFirstVowel}ay").Append(" ");
                 }
-                // if there are no vowels
-                else if (!ContainsVowel(word, VOWELS))
+                // if there are no vowels and not an empty input
+                else if (!ContainsVowel(word, VOWELS) && !ContainsNullOrWhiteSpace(word))
                 {
                     pigLatinWords.Append($"{word}-ay").Append(" ");
                 }
@@ -166,6 +178,33 @@ namespace PigLatinTranslator
             Regex containsSymbol = new Regex(@"[#$%@^&*)(\[\]{}\\]");
             if (containsSymbol.IsMatch(userInput))
             {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        // method to check if the input contains punctuation
+        private static bool ContainsPunctuation(string userInput, char[] PUNCTUATION)
+        {
+            // Regex containsPunctuation = new Regex(@"[!,.?]");
+            if (userInput.IndexOfAny(PUNCTUATION) != -1)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        // check for null or whitespace
+        private static bool ContainsNullOrWhiteSpace(string userInput)
+        {
+            if (String.IsNullOrWhiteSpace(userInput))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Sorry but you didn't input anything to be translated");
                 return true;
             }
             else
