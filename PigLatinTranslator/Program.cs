@@ -97,6 +97,7 @@ namespace PigLatinTranslator
                 {
                     pigLatinWords.Append($"{word}").Append(" ");
                 }
+                // if word has a symbol and first letter is vowel OR word has symbol and first letter isnt vowel
                 else if (ContainsSymbol(word) && firstVowelIndex == 0 || ContainsSymbol(word) && firstVowelIndex > 0)
                 {
                     pigLatinWords.Append($"{word}").Append(" ");
@@ -128,15 +129,7 @@ namespace PigLatinTranslator
             return string.Join(' ',pigLatinWords);
         }
 
-        private static bool ContainsVowel(string userInput, char[] VOWELS)
-        {
-            if (userInput.IndexOfAny(VOWELS) != -1)
-            {
-                return true;
-            }
-            return false;
-        }
-
+        // hey hey hey to the user
         private static void GreetUser()
         {
             Console.ForegroundColor = ConsoleColor.White;
@@ -145,7 +138,16 @@ namespace PigLatinTranslator
             // prompt the user for a word
             Console.Write("Please enter a word to be translated: ");
         }
-        
+        // method to check if the user input contains a vowel
+        private static bool ContainsVowel(string userInput, char[] VOWELS)
+        {
+            if (userInput.IndexOfAny(VOWELS) != -1)
+            {
+                return true;
+            }
+            return false;
+        }
+        // method to check if user input conatins numbers
         private static bool ContainsNumber(string userInput)
         {
             Regex containsNumber = new Regex(@"[0-9]");
@@ -158,10 +160,10 @@ namespace PigLatinTranslator
                 return false;
             }
         }
-
+        // method to check if user input contains sumbols
         private static bool ContainsSymbol(string userInput)
         {
-            Regex containsSymbol = new Regex(@"\W");
+            Regex containsSymbol = new Regex(@"[#$%@^&*)(\[\]{}\\]");
             if (containsSymbol.IsMatch(userInput))
             {
                 return true;
