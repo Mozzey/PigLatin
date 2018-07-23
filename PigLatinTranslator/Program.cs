@@ -17,11 +17,14 @@ namespace PigLatinTranslator
                 GreetUser();
                 // store user input and convert to lower case
                 string userInput = Console.ReadLine().ToLower();
-                // store piglatin translation
-                string pigLatin = TranslateToPigLatin(userInput);
-                // display translation
-                Console.WriteLine(pigLatin);
-               
+                if (!ContainsNullOrWhiteSpace(userInput))
+                {
+                    // store piglatin translation
+                    string pigLatin = TranslateToPigLatin(userInput);
+                    // display translation
+                    Console.WriteLine(pigLatin);
+                }
+                
                 // ask if the user would like to play again
                 if (!PlayAgain())
                 {
@@ -43,17 +46,16 @@ namespace PigLatinTranslator
             // user input split into an array from the space character
             string[] userInputArray = userInput.Trim().Split(' ');
             // iterate through each word in the user input
-            foreach (var word in userInputArray)
+            foreach (var words in userInputArray)
             {
-                // WORD SUBSTRINGS
+                var word = words.Trim();
+                bool IsFirstIndexUppercase = char.IsUpper(word[0]);
+                if (IsFirstIndexUppercase)
+                {
+                    Console.WriteLine(word);
+                }
                 // first vowel index of each word
                 int firstVowelIndex = word.IndexOfAny(VOWELS);
-                // word before vowel - ternary operator stating if there is a vowel in the word, beforeFirstVowel returns substring before first vowel
-                // else beforeFirstVowel becomes word as to not be ArgumentOutOfBounds
-                string beforeFirstVowel = (ContainsVowel(word, VOWELS)) ? word.Substring(0, firstVowelIndex) : word;
-                // word from first vowel - t- ternary operator stating if there is a vowel in the word, fromFirstVowel returns substring from the first vowel to the end of the word
-                // else beforeFirstVowel becomes word as to not be ArgumentOutOfBounds
-                string fromFirstVowel = (ContainsVowel(word, VOWELS)) ? word.Substring(firstVowelIndex, (word.Length - firstVowelIndex)) : word;
                 // if character contains punctuation allow it ex: "hey you're over there!" == "ey-hay ou're-yay over-way ere-thay!"
                 if (ContainsPunctuation(word, PUNCTUATION) && !ContainsSymbol(word))
                 {
@@ -78,6 +80,12 @@ namespace PigLatinTranslator
                 // find the first vowel and do the translation
                 else if (firstVowelIndex > 0)
                 {
+                    // word before vowel - ternary operator stating if there is a vowel in the word, beforeFirstVowel returns substring before first vowel
+                    // else beforeFirstVowel becomes word as to not be ArgumentOutOfBounds
+                    string beforeFirstVowel = (ContainsVowel(word, VOWELS)) ? word.Substring(0, firstVowelIndex) : word;
+                    // word from first vowel - t- ternary operator stating if there is a vowel in the word, fromFirstVowel returns substring from the first vowel to the end of the word
+                    // else beforeFirstVowel becomes word as to not be ArgumentOutOfBounds
+                    string fromFirstVowel = (ContainsVowel(word, VOWELS)) ? word.Substring(firstVowelIndex, (word.Length - firstVowelIndex)) : word;
                     pigLatinWords.Append($"{fromFirstVowel}-{beforeFirstVowel}ay").Append(" ");
                 }
                 // if there are no vowels and not an empty input
@@ -98,7 +106,7 @@ namespace PigLatinTranslator
             // fancy pants success color for translated input
             Console.ForegroundColor = ConsoleColor.Green;
             // join the words in the piglatin string builder at the space character
-            return string.Join(' ',pigLatinWords);
+            return string.Join(' ', pigLatinWords);
         }
         // hey hey hey to the user
         private static void GreetUser()
@@ -107,22 +115,22 @@ namespace PigLatinTranslator
             // greet user
             Console.WriteLine("Welcome to the Pig Latin Translator!");
             // prompt the user for a word
-            Console.Write("Please enter a word to be translated: ");
+            Console.Write("Please enter a sentence to be translated: ");
         }
         // method to check if the user input contains a vowel
-        private static bool ContainsVowel(string userInput, char[] VOWELS)
+        private static bool ContainsVowel(string word, char[] VOWELS)
         {
-            if (userInput.IndexOfAny(VOWELS) != -1)
+            if (word.IndexOfAny(VOWELS) != -1)
             {
                 return true;
             }
             return false;
         }
         // method to check if user input conatins numbers
-        private static bool ContainsNumber(string userInput)
+        private static bool ContainsNumber(string word)
         {
             Regex containsNumber = new Regex(@"[0-9]");
-            if (containsNumber.IsMatch(userInput))
+            if (containsNumber.IsMatch(word))
             {
                 return true;
             }
@@ -132,23 +140,10 @@ namespace PigLatinTranslator
             }
         }
         // method to check if user input contains sumbols
-        private static bool ContainsSymbol(string userInput)
+        private static bool ContainsSymbol(string word)
         {
             Regex containsSymbol = new Regex(@"[#$%@^&*)(\[\]{}\\]");
-            if (containsSymbol.IsMatch(userInput))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        // method to check if the input contains punctuation
-        private static bool ContainsPunctuation(string userInput, char[] PUNCTUATION)
-        {
-            // Regex containsPunctuation = new Regex(@"[!,.?]");
-            if (userInput.IndexOfAny(PUNCTUATION) != -1)
+            if (containsSymbol.IsMatch(word))
             {
                 return true;
             }
@@ -158,9 +153,9 @@ namespace PigLatinTranslator
             }
         }
         // check for null or whitespace
-        private static bool ContainsNullOrWhiteSpace(string userInput)
+        private static bool ContainsNullOrWhiteSpace(string word)
         {
-            if (String.IsNullOrWhiteSpace(userInput))
+            if (String.IsNullOrWhiteSpace(word))
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Sorry but you didn't input anything to be translated");
@@ -171,27 +166,40 @@ namespace PigLatinTranslator
                 return false;
             }
         }
-        // gets the punctuation and moves it to the end of the word
-        private static string AllowPunctuation(string userInput, char[] PUNCTUATION)
+        // method to check if the input contains punctuation
+        private static bool ContainsPunctuation(string word, char[] PUNCTUATION)
         {
-            int indexOfPunctuation = userInput.IndexOfAny(PUNCTUATION);
+            // Regex containsPunctuation = new Regex(@"[!,.?]");
+            if (word.IndexOfAny(PUNCTUATION) != -1)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        // gets the punctuation and moves it to the end of the word
+        private static string AllowPunctuation(string word, char[] PUNCTUATION)
+        {
+            int indexOfPunctuation = word.IndexOfAny(PUNCTUATION);
             // substring grabbing the punctuation
-            string punctuationMark = userInput.Substring(indexOfPunctuation, 1);
+            string punctuationMark = word.Substring(indexOfPunctuation, 1);
             // assign the punctuation to another variable so it can be worked on
             string wordNoPunctuation;
 
             if (indexOfPunctuation == -1)
             {
-                return userInput;
+                return word;
             }
             else
             {
-                wordNoPunctuation = userInput.Remove(indexOfPunctuation, 1);
+                wordNoPunctuation = word.Remove(indexOfPunctuation, 1);
                 string pigLatinWithPunctuation = $"{TranslateToPigLatin(wordNoPunctuation).Trim()}{punctuationMark}";
                 return pigLatinWithPunctuation;
             }
         }
-        // method asking wether user would like to play again/ enter another number
+        // method asking wether user would like to play again/enter another number
         private static bool PlayAgain()
         {
             // try catch to handle exception a character must be input
