@@ -7,7 +7,7 @@ namespace PigLatinTranslator
 {
     class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             // loop flag
             bool isRunning = true;
@@ -30,40 +30,7 @@ namespace PigLatinTranslator
                 }
             }
         }
-
-        // method asking wether user would like to play again/ enter another number
-        private static bool PlayAgain()
-        {
-            // try catch to handle exception a character must be input
-            // in case of blank input
-            try
-            {
-                Console.ForegroundColor = ConsoleColor.White;
-                // ask the user if they would like play again
-                Console.WriteLine("Would you like to enter another word to be translated? ( y/n )");
-                // parse the input into a char y/n
-                string yesOrNo = Console.ReadLine().ToLower();
-                if (yesOrNo.StartsWith('y'))
-                {
-                    return true;
-                }
-                else if(yesOrNo.StartsWith('n'))
-                {
-                    return false;
-                }
-                else
-                {
-                    // if incorrect input call PlayAgain recursively
-                    return PlayAgain();
-                }
-
-            }
-            catch (Exception)
-            {
-                // // if incorrect input causes a no character exception call PlayAgain recursively
-                return PlayAgain();
-            }
-        }
+        
         // seperate method to translate userInput into piglatin
         private static string TranslateToPigLatin(string userInput)
         {
@@ -88,7 +55,7 @@ namespace PigLatinTranslator
                 // else beforeFirstVowel becomes word as to not be ArgumentOutOfBounds
                 string fromFirstVowel = (ContainsVowel(word, VOWELS)) ? word.Substring(firstVowelIndex, (word.Length - firstVowelIndex)) : word;
                 // if character contains punctuation allow it ex: "hey you're over there!" == "ey-hay ou're-yay over-way ere-thay!"
-                if (ContainsPunctuation(word, PUNCTUATION))
+                if (ContainsPunctuation(word, PUNCTUATION) && !ContainsSymbol(word))
                 {
                     pigLatinWords.Append($"{AllowPunctuation(word, PUNCTUATION)}").Append(" ");
                 }
@@ -122,6 +89,10 @@ namespace PigLatinTranslator
                 else if ((ContainsNumber(userInput) && !ContainsVowel(word, VOWELS)))
                 {
                     pigLatinWords.Append($"{word}").Append(" ");
+                }
+                else
+                {
+                    break;
                 }
             }
             // fancy pants success color for translated input
@@ -218,6 +189,39 @@ namespace PigLatinTranslator
                 wordNoPunctuation = userInput.Remove(indexOfPunctuation, 1);
                 string pigLatinWithPunctuation = $"{TranslateToPigLatin(wordNoPunctuation).Trim()}{punctuationMark}";
                 return pigLatinWithPunctuation;
+            }
+        }
+        // method asking wether user would like to play again/ enter another number
+        private static bool PlayAgain()
+        {
+            // try catch to handle exception a character must be input
+            // in case of blank input
+            try
+            {
+                Console.ForegroundColor = ConsoleColor.White;
+                // ask the user if they would like play again
+                Console.WriteLine("Would you like to enter another word to be translated? ( y/n )");
+                // parse the input into a char y/n
+                string yesOrNo = Console.ReadLine().ToLower();
+                if (yesOrNo.StartsWith('y'))
+                {
+                    return true;
+                }
+                else if (yesOrNo.StartsWith('n'))
+                {
+                    return false;
+                }
+                else
+                {
+                    // if incorrect input call PlayAgain recursively
+                    return PlayAgain();
+                }
+
+            }
+            catch (Exception)
+            {
+                // // if incorrect input causes a no character exception call PlayAgain recursively
+                return PlayAgain();
             }
         }
     }
